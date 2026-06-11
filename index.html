@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC426 — Practical Works</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #e8edf5;
+    color: #1e2d4a;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #1e2d4a;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  header h1 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+
+  nav { display: flex; gap: 2px; }
+
+  nav button {
+    background: transparent;
+    border: none;
+    padding: 8px 20px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #8fa3c4;
+    border-bottom: 3px solid transparent;
+    height: 56px;
+    transition: all 0.15s;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  nav button:hover { color: #fff; }
+
+  nav button.active {
+    color: #fff;
+    border-bottom-color: #4a90d9;
+  }
+
+  main {
+    display: flex;
+    justify-content: center;
+    padding: 48px 16px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 32px;
+    width: 340px;
+    box-shadow: 0 2px 12px rgba(30,45,74,0.1);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e8edf5;
+  }
+
+  .card-header .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4a90d9;
+  }
+
+  .card-header h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e2d4a;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  #display {
+    background: #f4f7fc;
+    border: 1px solid #d0dbec;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    text-align: right;
+    border-left: 4px solid #4a90d9;
+  }
+
+  #expr { font-size: 11px; color: #8fa3c4; min-height: 16px; word-break: break-all; }
+  #result { font-size: 28px; font-weight: 600; color: #1e2d4a; min-height: 36px; word-break: break-all; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 7px;
+  }
+
+  .btn {
+    padding: 13px 0;
+    border: 1px solid #d0dbec;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #fff;
+    color: #1e2d4a;
+    font-weight: 500;
+    transition: all 0.12s;
+  }
+
+  .btn:hover { background: #f4f7fc; border-color: #b0c4de; }
+
+  .btn.op { background: #f4f7fc; color: #4a90d9; font-weight: 600; }
+  .btn.op:hover { background: #e8edf5; }
+
+  .btn.clear { color: #c0392b; background: #fef5f5; border-color: #f5c6c6; }
+  .btn.clear:hover { background: #fce8e8; }
+
+  .btn.equals {
+    background: #4a90d9;
+    color: #fff;
+    border-color: #4a90d9;
+    grid-column: span 2;
+    font-weight: 600;
+  }
+
+  .btn.equals:hover { background: #3a7ec8; }
+
+  .field { margin-bottom: 18px; }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a6080;
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d0dbec;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #1e2d4a;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .field input:focus { border-color: #4a90d9; box-shadow: 0 0 0 3px rgba(74,144,217,0.12); }
+  .field input.error { border-color: #c0392b; box-shadow: 0 0 0 3px rgba(192,57,43,0.1); }
+
+  .field-error { font-size: 12px; color: #c0392b; margin-top: 5px; min-height: 16px; }
+
+  .form-actions { display: flex; gap: 8px; margin-top: 22px; }
+
+  .btn-login {
+    flex: 1;
+    padding: 11px;
+    background: #4a90d9;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .btn-login:hover { background: #3a7ec8; }
+
+  .btn-reset {
+    padding: 11px 18px;
+    background: #fff;
+    color: #6a80a0;
+    border: 1px solid #d0dbec;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  .btn-reset:hover { background: #f4f7fc; color: #1e2d4a; }
+
+  .message {
+    margin-top: 16px;
+    padding: 10px 14px;
+    border-radius: 5px;
+    font-size: 13px;
+    display: none;
+    border-left: 4px solid;
+  }
+
+  .message.success { background: #eef7ee; color: #2a6a2a; border-color: #4a9a4a; display: block; }
+  .message.fail { background: #fef5f5; color: #8a2020; border-color: #c0392b; display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CSC426 — Practical Works</h1>
+  <nav>
+    <button class="active" onclick="switchTab('calc', this)">Calculator</button>
+    <button onclick="switchTab('login', this)">Login</button>
+  </nav>
+</header>
+
+<main>
+  <div class="panel active" id="calc">
+    <div class="card">
+      <div class="card-header"><div class="dot"></div><h2>Calculator</h2></div>
+      <div id="display">
+        <div id="expr"></div>
+        <div id="result">0</div>
+      </div>
+      <div class="grid">
+        <button class="btn clear" onclick="clearAll()">C</button>
+        <button class="btn op" onclick="append('^')">^</button>
+        <button class="btn op" onclick="append('%')">%</button>
+        <button class="btn op" onclick="append('\\')">&#92;</button>
+        <button class="btn" onclick="append('7')">7</button>
+        <button class="btn" onclick="append('8')">8</button>
+        <button class="btn" onclick="append('9')">9</button>
+        <button class="btn op" onclick="append('/')">÷</button>
+        <button class="btn" onclick="append('4')">4</button>
+        <button class="btn" onclick="append('5')">5</button>
+        <button class="btn" onclick="append('6')">6</button>
+        <button class="btn op" onclick="append('*')">×</button>
+        <button class="btn" onclick="append('1')">1</button>
+        <button class="btn" onclick="append('2')">2</button>
+        <button class="btn" onclick="append('3')">3</button>
+        <button class="btn op" onclick="append('-')">−</button>
+        <button class="btn" onclick="append('0')">0</button>
+        <button class="btn" onclick="append('.')">.</button>
+        <button class="btn equals" onclick="calculate()">=</button>
+        <button class="btn op" onclick="append('+')">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="login">
+    <div class="card">
+      <div class="card-header"><div class="dot"></div><h2>Login</h2></div>
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username">
+        <div class="field-error" id="username-err"></div>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password">
+        <div class="field-error" id="password-err"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-login" onclick="handleLogin()">Login</button>
+        <button class="btn-reset" onclick="resetForm()">Reset</button>
+      </div>
+      <div class="message" id="auth-msg"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let expr = '';
+
+  function switchTab(tab, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    el.classList.add('active');
+  }
+
+  function append(val) {
+    const ops = ['+', '-', '*', '/', '^', '%', '\\'];
+    if (ops.includes(val) && ops.includes(expr.slice(-1))) return;
+    if (val === '.' && /\d*\.\d*$/.test(expr)) return;
+    expr += val;
+    document.getElementById('expr').textContent = expr;
+    document.getElementById('result').textContent = expr;
+  }
+
+  function clearAll() {
+    expr = '';
+    document.getElementById('expr').textContent = '';
+    document.getElementById('result').textContent = '0';
+  }
+
+  function calculate() {
+    if (!expr) return;
+    try {
+      if (expr.includes('\\')) {
+        const parts = expr.split('\\');
+        if (parts.length === 2) {
+          const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
+          if (!isNaN(a) && !isNaN(b) && b !== 0) {
+            const res = Math.floor(a / b);
+            document.getElementById('expr').textContent = expr + ' =';
+            document.getElementById('result').textContent = res;
+            expr = String(res); return;
+          }
+        }
+      }
+      const e = expr.replace(/\^/g, '**');
+      const res = Function('"use strict"; return (' + e + ')')();
+      document.getElementById('expr').textContent = expr + ' =';
+      document.getElementById('result').textContent = parseFloat(res.toFixed(10));
+      expr = String(parseFloat(res.toFixed(10)));
+    } catch { document.getElementById('result').textContent = 'Error'; expr = ''; }
+  }
+
+  const VALID_USER = 'admin', VALID_PASS = 'password123';
+
+  function handleLogin() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
+    let valid = true;
+    ['username','password'].forEach(id => {
+      document.getElementById(id+'-err').textContent = '';
+      document.getElementById(id).classList.remove('error');
+    });
+    document.getElementById('auth-msg').className = 'message';
+    if (!u) { document.getElementById('username-err').textContent = 'Username is required.'; document.getElementById('username').classList.add('error'); valid = false; }
+    if (!p) { document.getElementById('password-err').textContent = 'Password is required.'; document.getElementById('password').classList.add('error'); valid = false; }
+    else if (p.length < 6) { document.getElementById('password-err').textContent = 'Password must be at least 6 characters.'; document.getElementById('password').classList.add('error'); valid = false; }
+    if (!valid) return;
+    const msg = document.getElementById('auth-msg');
+    if (u === VALID_USER && p === VALID_PASS) { msg.textContent = 'Login successful. Welcome, ' + u + '!'; msg.className = 'message success'; }
+    else { msg.textContent = 'Incorrect username or password.'; msg.className = 'message fail'; }
+  }
+
+  function resetForm() {
+    ['username','password'].forEach(id => {
+      document.getElementById(id).value = '';
+      document.getElementById(id+'-err').textContent = '';
+      document.getElementById(id).classList.remove('error');
+    });
+    document.getElementById('auth-msg').className = 'message';
+  }
+</script>
+</body>
+</html>
